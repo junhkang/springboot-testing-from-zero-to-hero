@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.github.junhkang.springboottesting.repository.mybatis.UserMapper">
+
+    <select id="findAll" resultType="io.github.junhkang.springboottesting.domain.UserDTO">
+        SELECT
+            id,
+            username,
+            email
+        FROM users
+    </select>
+
+    <select id="findById" resultType="io.github.junhkang.springboottesting.domain.UserDTO" parameterType="long">
+        SELECT
+            id,
+            username,
+            email
+        FROM users
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByUsername" resultType="io.github.junhkang.springboottesting.domain.UserDTO" parameterType="string">
+        SELECT
+            id,
+            username,
+            email
+        FROM users
+        WHERE username = #{username}
+    </select>
+
+    <insert id="insert" parameterType="io.github.junhkang.springboottesting.domain.UserDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, email)
+        VALUES (#{username}, #{email})
+    </insert>
+
+    <update id="update" parameterType="io.github.junhkang.springboottesting.domain.UserDTO">
+        UPDATE users
+        SET
+            username = #{username},
+            email = #{email}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+</mapper>

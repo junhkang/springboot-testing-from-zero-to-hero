@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.github.junhkang.springboottesting.repository.mybatis.ProductMapper">
+
+    <select id="findAll" resultType="io.github.junhkang.springboottesting.domain.ProductDTO">
+        SELECT
+            id,
+            name,
+            description,
+            price,
+            stock
+        FROM product
+    </select>
+
+    <select id="findById" resultType="io.github.junhkang.springboottesting.domain.ProductDTO" parameterType="long">
+        SELECT
+            id,
+            name,
+            description,
+            price,
+            stock
+        FROM product
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByName" resultType="io.github.junhkang.springboottesting.domain.ProductDTO" parameterType="string">
+        SELECT
+            id,
+            name,
+            description,
+            price,
+            stock
+        FROM product
+        WHERE name = #{name}
+    </select>
+
+    <insert id="insert" parameterType="io.github.junhkang.springboottesting.domain.ProductDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product (name, description, price, stock)
+        VALUES (#{name}, #{description}, #{price}, #{stock})
+    </insert>
+
+    <update id="update" parameterType="io.github.junhkang.springboottesting.domain.ProductDTO">
+        UPDATE product
+        SET
+            name = #{name},
+            description = #{description},
+            price = #{price},
+            stock = #{stock}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM product WHERE id = #{id}
+    </delete>
+
+</mapper>

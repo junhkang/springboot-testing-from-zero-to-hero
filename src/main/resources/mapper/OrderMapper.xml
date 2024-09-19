@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.github.junhkang.springboottesting.repository.mybatis.OrderMapper">
+
+    <select id="findAll" resultType="io.github.junhkang.springboottesting.domain.OrderDTO">
+        SELECT
+            o.id,
+            o.order_date,
+            o.user_id,
+            u.username,
+            u.email,
+            o.product_id,
+            p.name AS product_name,
+            p.description AS product_description,
+            p.price,
+            p.stock,
+            o.quantity,
+            o.status,
+            o.total_amount
+        FROM orders o
+                 JOIN users u ON o.user_id = u.id
+                 JOIN product p ON o.product_id = p.id
+    </select>
+
+    <select id="findById" resultType="io.github.junhkang.springboottesting.domain.OrderDTO" parameterType="long">
+        SELECT
+            o.id,
+            o.order_date,
+            o.user_id,
+            u.username,
+            u.email,
+            o.product_id,
+            p.name AS product_name,
+            p.description AS product_description,
+            p.price,
+            p.stock,
+            o.quantity,
+            o.status,
+            o.total_amount
+        FROM orders o
+                 JOIN users u ON o.user_id = u.id
+                 JOIN product p ON o.product_id = p.id
+        WHERE o.id = #{id}
+    </select>
+
+    <select id="findByUserId" resultType="io.github.junhkang.springboottesting.domain.OrderDTO" parameterType="long">
+        SELECT
+            o.id,
+            o.order_date,
+            o.user_id,
+            u.username,
+            u.email,
+            o.product_id,
+            p.name AS product_name,
+            p.description AS product_description,
+            p.price,
+            p.stock,
+            o.quantity,
+            o.status,
+            o.total_amount
+        FROM orders o
+                 JOIN users u ON o.user_id = u.id
+                 JOIN product p ON o.product_id = p.id
+        WHERE o.user_id = #{userId}
+    </select>
+
+    <select id="findByOrderDateBetween" resultType="io.github.junhkang.springboottesting.domain.OrderDTO" parameterType="map">
+        SELECT
+            o.id,
+            o.order_date,
+            o.user_id,
+            u.username,
+            u.email,
+            o.product_id,
+            p.name AS product_name,
+            p.description AS product_description,
+            p.price,
+            p.stock,
+            o.quantity,
+            o.status,
+            o.total_amount
+        FROM orders o
+                 JOIN users u ON o.user_id = u.id
+                 JOIN product p ON o.product_id = p.id
+        WHERE o.order_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <insert id="insert" parameterType="io.github.junhkang.springboottesting.domain.OrderDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders (order_date, user_id, product_id, quantity, status, total_amount)
+        VALUES (#{orderDate}, #{userId}, #{productId}, #{quantity}, #{status}, #{totalAmount})
+    </insert>
+
+    <update id="update" parameterType="io.github.junhkang.springboottesting.domain.OrderDTO">
+        UPDATE orders
+        SET
+            order_date = #{orderDate},
+            user_id = #{userId},
+            product_id = #{productId},
+            quantity = #{quantity},
+            status = #{status},
+            total_amount = #{totalAmount}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM orders WHERE id = #{id}
+    </delete>
+
+</mapper>
