@@ -351,6 +351,23 @@ class JpaOrderServiceImplTest {
             assertThat(updatedProduct).isNotNull();
             assertThat(updatedProduct.getStock()).isEqualTo(48); // 50 - 2 = 48
         }
+        /**
+         * 반복된 주문 생성 테스트 - 여러 번 주문 생성하여 성능 확인
+         */
+        @RepeatedTest(value = 5, name = "주문 생성 반복 테스트 {currentRepetition}/{totalRepetitions}")
+        @DisplayName("주문 생성 반복 테스트")
+        @Transactional
+        void testCreateOrderRepeated() {
+            Long userId = testUser.getId();
+            Long productId = testProduct.getId();
+            Integer quantity = 3;
+
+            Order createdOrder = orderService.createOrder(userId, productId, quantity);
+
+            assertThat(createdOrder).isNotNull();
+            assertThat(createdOrder.getQuantity()).isEqualTo(quantity);
+            assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.PENDING);
+        }
     }
 
     /**
