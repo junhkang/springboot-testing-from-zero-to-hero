@@ -8,10 +8,10 @@ import io.github.junhkang.springboottesting.exception.ResourceNotFoundException;
 import io.github.junhkang.springboottesting.repository.jpa.OrderRepository;
 import io.github.junhkang.springboottesting.repository.jpa.ProductRepository;
 import io.github.junhkang.springboottesting.repository.jpa.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,6 +100,17 @@ class JpaOrderServiceImplTest {
             assertThat(orders).hasSize(7); // data.sql에서 5개의 주문 + 이 테스트에서 2개
         }
 
+        @ParameterizedTest
+        @ValueSource(ints = {1, 2, 3, 5, 10})
+        @DisplayName("다양한 수량으로 주문 생성 테스트")
+        void testCreateOrderWithDifferentQuantities(int quantity) {
+            Long userId = testUser.getId();
+            Long productId = testProduct.getId();
+
+            Order order = orderService.createOrder(userId, productId, quantity);
+
+            assertThat(order.getQuantity()).isEqualTo(quantity);
+        }
         /**
          * 주문 ID로 주문 조회 테스트 - 존재하는 ID
          */
@@ -221,6 +233,7 @@ class JpaOrderServiceImplTest {
         @Test
         @DisplayName("주문 생성 테스트 - 성공 케이스")
         @Transactional
+        @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
         void testCreateOrderSuccess() {
             // Given: 유효한 사용자 ID, 상품 ID, 및 수량
             Long userId = testUser.getId();
@@ -244,7 +257,24 @@ class JpaOrderServiceImplTest {
             assertThat(updatedProduct).isNotNull();
             assertThat(updatedProduct.getStock()).isEqualTo(45); // 50 - 5 = 45
         }
+        @ParameterizedTest
+        @CsvSource({
+                "test_user, test.user@example.com",
+                "john_doe, john.doe@example.com"
+        })
+        @DisplayName("다양한 사용자 이름 및 이메일로 주문 생성 테스트")
+        void testCreateOrderWithDifferentUsers(String username, String email) {
+            User user = new User();
+            user.setUsername(username);
+            user.setEmail(email);
+            userRepository.save(user);
 
+            Long productId = testProduct.getId();
+            Order order = orderService.createOrder(user.getId(), productId, 1);
+
+            assertThat(order.getUser().getUsername()).isEqualTo(username);
+            assertThat(order.getUser().getEmail()).isEqualTo(email);
+        }
         /**
          * 주문 생성 테스트 - 실패 케이스 (재고 부족)
          */
