@@ -54,6 +54,8 @@ public class MyBatisProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
+        if (product.getName() == null || product.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Product name is required.");}
         ProductDTO dto = new ProductDTO();
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());

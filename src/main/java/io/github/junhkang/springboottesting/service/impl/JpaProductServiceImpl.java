@@ -32,6 +32,15 @@ public class JpaProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
+        if (product.getName() == null || product.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Product name is required.");
+        }
+        if (product.getPrice() == null || product.getPrice() < 0) {
+            throw new IllegalArgumentException("Product price cannot be negative.");
+        }
+        if (product.getStock() == null || product.getStock() < 0) {
+            throw new IllegalArgumentException("Product stock cannot be negative.");
+        }
         return productRepository.save(product);
     }
 }

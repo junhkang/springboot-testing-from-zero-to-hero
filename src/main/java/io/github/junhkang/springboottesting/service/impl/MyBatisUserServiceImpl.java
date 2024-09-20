@@ -1,6 +1,8 @@
 package io.github.junhkang.springboottesting.service.impl;
 
 import io.github.junhkang.springboottesting.domain.User;
+import io.github.junhkang.springboottesting.domain.UserDTO;
+import io.github.junhkang.springboottesting.exception.ResourceNotFoundException;
 import io.github.junhkang.springboottesting.repository.mybatis.UserMapper;
 import io.github.junhkang.springboottesting.service.UserService;
 import org.springframework.context.annotation.Profile;
@@ -20,12 +22,12 @@ public class MyBatisUserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        // 필요한 변환 로직이 있다면 추가
         return userMapper.findAll().stream()
                 .map(dto -> {
                     User user = new User();
                     user.setId(dto.getId());
                     user.setUsername(dto.getUsername());
+                    user.setEmail(dto.getEmail());
                     return user;
                 })
                 .collect(Collectors.toList());
@@ -33,11 +35,32 @@ public class MyBatisUserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        return null;
+        UserDTO dto = userMapper.findById(id);
+        if (dto == null) {
+            throw new ResourceNotFoundException("User not found with id " + id);
+        }
+        User user = new User();
+        user.setId(dto.getId());
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        return user;
     }
 
     @Override
     public User createUser(User user) {
-        return null;
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("User name is required.");
+        }
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("User email is required.");
+        }
+
+        UserDTO dto = new UserDTO();
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+
+        userMapper.insert(dto);
+        user.setId(dto.getId());
+        return user;
     }
 }
