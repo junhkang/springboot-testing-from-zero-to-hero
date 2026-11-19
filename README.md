@@ -32,7 +32,7 @@ Windows에서는 `./mvnw` 대신 `.\mvnw.cmd`를 실행합니다. 로컬 H2 콘�
 
 # 목차
 
-1. [WHY - 왜 테스트를 작성해야 하는가?](https://github.com/junhkang/springboot-testing-from-zero-to-hero/blob/main/docs/1.WHY%20-%20%EC%99%9C%20%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%A5%BC%20%EC%9E%91%EC%84%B1%ED%95%B4%EC%95%BC%20%ED%95%98%EB%8A%94%EA%B0%80%3F.md)
+1. [WHY - 왜 테스트를 작성해야 하는가?](docs/1.why.md)
     - 1.1 테스트 코드의 중요성
     - 1.2 테스트 코드 작성의 장점
         - 1.2.1 안정적인 개발 환경 구축
@@ -43,7 +43,7 @@ Windows에서는 `./mvnw` 대신 `.\mvnw.cmd`를 실행합니다. 로컬 H2 콘�
     - 1.4 좋은 테스트 코드 - FIRST 원칙
 
 
-2. [HOW - 테스트 코드를 어떻게 작성해야 하는가?](https://github.com/junhkang/springboot-testing-from-zero-to-hero/blob/main/docs/2.HOW%20-%20%ED%85%8C%EC%8A%A4%ED%8A%B8%20%EC%BD%94%EB%93%9C%EB%A5%BC%20%EC%96%B4%EB%96%BB%EA%B2%8C%20%EC%9E%91%EC%84%B1%ED%95%B4%EC%95%BC%20%ED%95%98%EB%8A%94%EA%B0%80%3F.md)
+2. [HOW - 테스트 코드를 어떻게 작성해야 하는가?](docs/2.how.md)
     - 2.1 테스트 케이스 선택 방법
     - 2.2 TDD (Test-Driven Development) 방법론
     - 2.3 다양한 테스트 종류와 계층 구조 이해
@@ -53,7 +53,7 @@ Windows에서는 `./mvnw` 대신 `.\mvnw.cmd`를 실행합니다. 로컬 H2 콘�
     - 2.7 MockMvc와 WebTestClient를 사용한 웹 레이어 테스트
 
 
-3. [WHEN - 언제 테스트 코드를 적용해야 하는가?](https://github.com/junhkang/springboot-testing-from-zero-to-hero/blob/main/docs/3.WHEN%20-%20%EC%96%B8%EC%A0%9C%20%ED%85%8C%EC%8A%A4%ED%8A%B8%20%EC%BD%94%EB%93%9C%EB%A5%BC%20%EC%A0%81%EC%9A%A9%ED%95%B4%EC%95%BC%20%ED%95%98%EB%8A%94%EA%B0%80%3F.md)
+3. [WHEN - 언제 테스트 코드를 적용해야 하는가?](docs/3.when.md)
     - 3.1 TDD와 BDD의 개념 및 적용 시점
     - 3.2 기존 코드베이스에 테스트 추가하기
     - 3.3 새로운 기능 개발 시 테스트 작성 시점
@@ -61,7 +61,7 @@ Windows에서는 `./mvnw` 대신 `.\mvnw.cmd`를 실행합니다. 로컬 H2 콘�
     - 3.5 테스트 작성의 우선순위와 체크리스트
 
 
-4. [HOW DEEP - 얼마나 깊게 테스트 코드를 작성해야 하는가?](https://github.com/junhkang/springboot-testing-from-zero-to-hero/blob/main/docs/4.HOW%20DEEP%20-%20%EC%96%BC%EB%A7%88%EB%82%98%20%EA%B9%8A%EA%B2%8C%20%ED%85%8C%EC%8A%A4%ED%8A%B8%20%EC%BD%94%EB%93%9C%EB%A5%BC%20%EC%9E%91%EC%84%B1%ED%95%B4%EC%95%BC%20%ED%95%98%EB%8A%94%EA%B0%80%3F.md)
+4. [HOW DEEP - 얼마나 깊게 테스트 코드를 작성해야 하는가?](docs/4.how-deep.md)
     - 4.1 테스트 깊이를 결정하는 기준
     - 4.2 테스트 커버리지 및 품질 지표 활용
     - 4.3 오버테스팅의 문제점
