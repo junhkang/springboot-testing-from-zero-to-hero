@@ -45,6 +45,8 @@ public class JpaOrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order createOrder(Long userId, Long productId, Integer quantity) {
+        Order.validateQuantity(quantity);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
@@ -92,6 +94,8 @@ public class JpaOrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order updateOrderQuantity(Long id, Integer newQuantity) {
+        Order.validateQuantity(newQuantity);
+
         Order order = getOrderById(id);
 
         if (order.getStatus() != OrderStatus.PENDING) {

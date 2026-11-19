@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * 테스트 클래스: JpaProductServiceImplTest
  *
- * 이 클래스는 JpaProductServiceImpl 서비스 구현체의 비즈니스 로직을 검증하기 위한 단위 테스트를 제공합니다.
+ * 이 클래스는 JpaProductServiceImpl 서비스 구현체의 비즈니스 로직을 검증하기 위한 통합 테스트를 제공합니다.
  * @DataJpaTest 어노테이션을 사용하여 JPA 관련 컴포넌트만 로드하고, @ActiveProfiles("jpa")를 통해
  * 'jpa' 프로파일을 활성화하여 JPA 관련 설정과 빈만 로드합니다.
  */

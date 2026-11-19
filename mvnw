@@ -19,7 +19,7 @@
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
-# Apache Maven Wrapper startup batch script, version 3.3.2
+# Apache Maven Wrapper startup batch script, version 3.3.4
 #
 # Optional ENV vars
 # -----------------
@@ -105,14 +105,18 @@ trim() {
   printf "%s" "${1}" | tr -d '[:space:]'
 }
 
-# parse distributionUrl and optional distributionSha256Sum, requires .mvn/wrapper/maven-wrapper.properties
+scriptDir="$(dirname "$0")"
+scriptName="$(basename "$0")"
+
+# Parse the distribution URL and archive checksums from .mvn/wrapper/maven-wrapper.properties.
 while IFS="=" read -r key value; do
   case "${key-}" in
   distributionUrl) distributionUrl=$(trim "${value-}") ;;
   distributionSha256Sum) distributionSha256Sum=$(trim "${value-}") ;;
+  distributionTarGzSha256Sum) distributionTarGzSha256Sum=$(trim "${value-}") ;;
   esac
-done <"${0%/*}/.mvn/wrapper/maven-wrapper.properties"
-[ -n "${distributionUrl-}" ] || die "cannot read distributionUrl property in ${0%/*}/.mvn/wrapper/maven-wrapper.properties"
+done <"$scriptDir/.mvn/wrapper/maven-wrapper.properties"
+[ -n "${distributionUrl-}" ] || die "cannot read distributionUrl property in $scriptDir/.mvn/wrapper/maven-wrapper.properties"
 
 case "${distributionUrl##*/}" in
 maven-mvnd-*bin.*)
@@ -130,7 +134,7 @@ maven-mvnd-*bin.*)
   distributionUrl="${distributionUrl%-bin.*}-$distributionPlatform.zip"
   ;;
 maven-mvnd-*) MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/ ;;
-*) MVN_CMD="mvn${0##*/mvnw}" _MVNW_REPO_PATTERN=/org/apache/maven/ ;;
+*) MVN_CMD="mvn${scriptName#mvnw}" _MVNW_REPO_PATTERN=/org/apache/maven/ ;;
 esac
 
 # apply MVNW_REPOURL and calculate MAVEN_HOME
@@ -167,16 +171,19 @@ fi
 
 mkdir -p -- "${MAVEN_HOME%/*}"
 
-# Download and Install Apache Maven
-verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
-verbose "Downloading from: $distributionUrl"
-verbose "Downloading to: $TMP_DOWNLOAD_DIR/$distributionUrlName"
-
 # select .zip or .tar.gz
 if ! command -v unzip >/dev/null; then
   distributionUrl="${distributionUrl%.zip}.tar.gz"
   distributionUrlName="${distributionUrl##*/}"
+  if [ -n "${distributionSha256Sum-}" ]; then
+    distributionSha256Sum="${distributionTarGzSha256Sum:?Missing SHA-256 for the Maven tar.gz distribution}"
+  fi
 fi
+
+# Download and Install Apache Maven
+verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
+verbose "Downloading from: $distributionUrl"
+verbose "Downloading to: $TMP_DOWNLOAD_DIR/$distributionUrlName"
 
 # verbose opt
 __MVNW_QUIET_WGET=--quiet __MVNW_QUIET_CURL=--silent __MVNW_QUIET_UNZIP=-q __MVNW_QUIET_TAR=''
@@ -219,7 +226,7 @@ elif set_java_home; then
   "$(native_path "$JAVACMD")" -cp "$(native_path "$TMP_DOWNLOAD_DIR")" Downloader "$distributionUrl" "$(native_path "$targetZip")"
 fi
 
-# If specified, validate the SHA-256 sum of the Maven distribution zip file
+# If specified, validate the SHA-256 sum of the selected Maven archive.
 if [ -n "${distributionSha256Sum-}" ]; then
   distributionSha256Result=false
   if [ "$MVN_CMD" = mvnd.sh ]; then
@@ -227,7 +234,7 @@ if [ -n "${distributionSha256Sum-}" ]; then
     echo "Please disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
     exit 1
   elif command -v sha256sum >/dev/null; then
-    if echo "$distributionSha256Sum  $TMP_DOWNLOAD_DIR/$distributionUrlName" | sha256sum -c >/dev/null 2>&1; then
+    if echo "$distributionSha256Sum  $TMP_DOWNLOAD_DIR/$distributionUrlName" | sha256sum -c - >/dev/null 2>&1; then
       distributionSha256Result=true
     fi
   elif command -v shasum >/dev/null; then
@@ -241,7 +248,7 @@ if [ -n "${distributionSha256Sum-}" ]; then
   fi
   if [ $distributionSha256Result = false ]; then
     echo "Error: Failed to validate Maven distribution SHA-256, your Maven distribution might be compromised." >&2
-    echo "If you updated your Maven version, you need to update the specified distributionSha256Sum property." >&2
+    echo "If you updated Maven, update the checksum for $distributionUrlName in maven-wrapper.properties." >&2
     exit 1
   fi
 fi
@@ -252,8 +259,41 @@ if command -v unzip >/dev/null; then
 else
   tar xzf${__MVNW_QUIET_TAR:+"$__MVNW_QUIET_TAR"} "$TMP_DOWNLOAD_DIR/$distributionUrlName" -C "$TMP_DOWNLOAD_DIR" || die "failed to untar"
 fi
-printf %s\\n "$distributionUrl" >"$TMP_DOWNLOAD_DIR/$distributionUrlNameMain/mvnw.url"
-mv -- "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain" "$MAVEN_HOME" || [ -d "$MAVEN_HOME" ] || die "fail to move MAVEN_HOME"
+
+# Find the actual extracted directory name (handles snapshots where filename != directory name)
+actualDistributionDir=""
+
+# First try the expected directory name (for regular distributions)
+if [ -d "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain" ]; then
+  if [ -f "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain/bin/$MVN_CMD" ]; then
+    actualDistributionDir="$distributionUrlNameMain"
+  fi
+fi
+
+# If not found, search for any directory with the Maven executable (for snapshots)
+if [ -z "$actualDistributionDir" ]; then
+  # enable globbing to iterate over items
+  set +f
+  for dir in "$TMP_DOWNLOAD_DIR"/*; do
+    if [ -d "$dir" ]; then
+      if [ -f "$dir/bin/$MVN_CMD" ]; then
+        actualDistributionDir="$(basename "$dir")"
+        break
+      fi
+    fi
+  done
+  set -f
+fi
+
+if [ -z "$actualDistributionDir" ]; then
+  verbose "Contents of $TMP_DOWNLOAD_DIR:"
+  verbose "$(ls -la "$TMP_DOWNLOAD_DIR")"
+  die "Could not find Maven distribution directory in extracted archive"
+fi
+
+verbose "Found extracted Maven distribution directory: $actualDistributionDir"
+printf %s\\n "$distributionUrl" >"$TMP_DOWNLOAD_DIR/$actualDistributionDir/mvnw.url"
+mv -- "$TMP_DOWNLOAD_DIR/$actualDistributionDir" "$MAVEN_HOME" || [ -d "$MAVEN_HOME" ] || die "fail to move MAVEN_HOME"
 
 clean || :
 exec_maven "$@"

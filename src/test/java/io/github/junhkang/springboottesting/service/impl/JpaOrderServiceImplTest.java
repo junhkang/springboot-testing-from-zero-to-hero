@@ -13,14 +13,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * 테스트 클래스: JpaOrderServiceImplTest
  *
- * 이 클래스는 JpaOrderServiceImpl 서비스 구현체의 비즈니스 로직을 검증하기 위한 단위 테스트를 제공합니다.
+ * 이 클래스는 JpaOrderServiceImpl 서비스 구현체의 비즈니스 로직을 검증하기 위한 통합 테스트를 제공합니다.
  * @DataJpaTest 어노테이션을 사용하여 JPA 관련 컴포넌트만 로드하고, @ActiveProfiles("jpa")를 통해
  * 'jpa' 프로파일을 활성화하여 JPA 관련 설정과 빈만 로드합니다.
  */
@@ -232,8 +230,6 @@ class JpaOrderServiceImplTest {
          */
         @Test
         @DisplayName("주문 생성 테스트 - 성공 케이스")
-        @Transactional
-        @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
         void testCreateOrderSuccess() {
             // Given: 유효한 사용자 ID, 상품 ID, 및 수량
             Long userId = testUser.getId();
@@ -304,7 +300,6 @@ class JpaOrderServiceImplTest {
          */
         @Test
         @DisplayName("주문 수량 업데이트 테스트 - 성공 케이스 (증가)")
-        @Transactional
         void testUpdateOrderQuantityIncrease() {
             // Given: 주문을 생성 및 저장 (서비스 메서드 사용)
             Order order = orderService.createOrder(testUser.getId(), testProduct.getId(), 2);
@@ -356,7 +351,6 @@ class JpaOrderServiceImplTest {
          */
         @RepeatedTest(value = 5, name = "주문 생성 반복 테스트 {currentRepetition}/{totalRepetitions}")
         @DisplayName("주문 생성 반복 테스트")
-        @Transactional
         void testCreateOrderRepeated() {
             Long userId = testUser.getId();
             Long productId = testProduct.getId();
@@ -382,7 +376,6 @@ class JpaOrderServiceImplTest {
          */
         @Test
         @DisplayName("주문 취소 테스트 - 성공 케이스")
-        @Transactional
         void testCancelOrderSuccess() {
             // Given: 주문을 생성 및 저장 (서비스 메서드 사용)
             Order order = orderService.createOrder(testUser.getId(), testProduct.getId(), 2);

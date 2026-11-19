@@ -28,4 +28,10 @@ public class Order {
     private OrderStatus status;
 
     private Double totalAmount;
+
+    public static void validateQuantity(Integer quantity) {
+        if (quantity == null || quantity < 1) {
+            throw new IllegalArgumentException("Order quantity must be at least 1.");
+        }
+    }
 }
