@@ -1,7 +1,7 @@
 # References
 
-1. [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/)
-    - Official documentation for JUnit 5, explaining core features and annotations.
+1. [JUnit User Guide](https://docs.junit.org/6.0.3/overview.html)
+    - Official documentation for JUnit 6 and JUnit Jupiter annotations.
 2. [Mockito Documentation](https://site.mockito.org/)
     - Official Mockito documentation providing details on mocking frameworks.
 3. [Applying Test-Driven Development](https://medium.com/pilar-2020/applying-test-driven-development-6d6d3af186cb)

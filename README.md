@@ -17,6 +17,19 @@
 
 이 가이드는 간단한 전자상거래 시스템을 예제로 활용해 다양한 테스트 케이스와 실제 코드를 통해, 이 질문들에 대한 실용적인 답변을 제시합니다.
 
+## 실행 및 테스트
+
+JDK 21이 필요합니다. Maven Wrapper가 Maven 3.9.16을 내려받습니다. Spring Boot 4.1.2, MyBatis Spring Boot Starter 4.1.0, JUnit Jupiter 6.0.3을 사용합니다.
+
+```bash
+./mvnw clean verify
+./mvnw spring-boot:run
+```
+
+기본 프로필은 `jpa`입니다. MyBatis 예제는 `./mvnw spring-boot:run -Dspring-boot.run.profiles=mybatis`로 실행합니다. 두 프로필 모두 인메모리 H2를 사용합니다. 기본 주소에서 `GET /orders`로 샘플 주문을 조회할 수 있습니다.
+
+Windows에서는 `./mvnw` 대신 `.\mvnw.cmd`를 실행합니다. 로컬 H2 콘솔이 필요하면 실행 시 `-Dspring-boot.run.arguments=--spring.h2.console.enabled=true`를 전달하고, 시작 로그의 JDBC URL로 `/h2-console`에 접속합니다.
+
 # 목차
 
 1. [WHY - 왜 테스트를 작성해야 하는가?](https://github.com/junhkang/springboot-testing-from-zero-to-hero/blob/main/docs/1.WHY%20-%20%EC%99%9C%20%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%A5%BC%20%EC%9E%91%EC%84%B1%ED%95%B4%EC%95%BC%20%ED%95%98%EB%8A%94%EA%B0%80%3F.md)
@@ -34,9 +47,10 @@
     - 2.1 테스트 케이스 선택 방법
     - 2.2 TDD (Test-Driven Development) 방법론
     - 2.3 다양한 테스트 종류와 계층 구조 이해
-    - 2.4 JUnit5 활용
+    - 2.4 JUnit Jupiter 활용
     - 2.5 Mockito와 같은 Mocking 프레임워크 사용
     - 2.6 다양한 테스트 어노테이션 및 도구 활용
+    - 2.7 MockMvc와 WebTestClient를 사용한 웹 레이어 테스트
 
 
 3. [WHEN - 언제 테스트 코드를 적용해야 하는가?](https://github.com/junhkang/springboot-testing-from-zero-to-hero/blob/main/docs/3.WHEN%20-%20%EC%96%B8%EC%A0%9C%20%ED%85%8C%EC%8A%A4%ED%8A%B8%20%EC%BD%94%EB%93%9C%EB%A5%BC%20%EC%A0%81%EC%9A%A9%ED%95%B4%EC%95%BC%20%ED%95%98%EB%8A%94%EA%B0%80%3F.md)
@@ -53,3 +67,8 @@
     - 4.3 오버테스팅의 문제점
     - 4.4 효율적인 테스트 범위 설정을 위한 체크리스트
     - 4.5 리팩토링과 테스트의 균형 잡기
+
+5. [SPEC-DRIVEN DEVELOPMENT - 스펙에서 테스트로](docs/5.spec-driven-development.md)
+    - 5.1 주문 수량 스펙
+    - 5.2 인수 조건을 테스트에 옮기기
+    - 5.3 실패를 확인하고 구현하기

@@ -47,6 +47,8 @@ public class MyBatisOrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order createOrder(Long userId, Long productId, Integer quantity) {
+        Order.validateQuantity(quantity);
+
         UserDTO userDTO = userMapper.findById(userId);
         if (userDTO == null) {
             throw new ResourceNotFoundException("User not found with id " + userId);
@@ -107,6 +109,8 @@ public class MyBatisOrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order updateOrderQuantity(Long id, Integer newQuantity) {
+        Order.validateQuantity(newQuantity);
+
         OrderDTO dto = orderMapper.findById(id);
         if (dto == null) {
             throw new ResourceNotFoundException("Order not found with id " + id);

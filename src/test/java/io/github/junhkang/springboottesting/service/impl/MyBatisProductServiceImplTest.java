@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,12 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * MyBatisProductServiceImpl의 단위 테스트 클래스
+ * MyBatisProductServiceImpl의 통합 테스트 클래스
  * MyBatis 기반의 ProductService 구현체를 테스트하며, 각 메서드의 동작을 검증합니다.
  */
 @SpringBootTest
-@Import(MyBatisProductServiceImpl.class)
 @ActiveProfiles("mybatis")
+@Transactional
 @DisplayName("MyBatisProductServiceImpl Test")
 class MyBatisProductServiceImplTest {
 
@@ -66,8 +66,7 @@ class MyBatisProductServiceImplTest {
             List<Product> products = productService.getAllProducts();
 
             // Then: 데이터베이스에 저장된 상품이 정상적으로 조회되는지 검증
-            assertThat(products).isNotNull();
-            assertThat(products.size()).isGreaterThan(0); // 최소 1개 이상 있어야 함 (테스트에서 생성한 상품 포함)
+            assertThat(products).extracting(Product::getId).contains(testProduct.getId());
         }
 
         @Test
@@ -119,9 +118,8 @@ class MyBatisProductServiceImplTest {
             assertThat(createdProduct.getId()).isNotNull();
             assertThat(createdProduct.getName()).isEqualTo("New Product");
 
-            // Then: 데이터베이스에서 전체 상품 조회하여 상품이 추가되었는지 검증
-            List<Product> products = productService.getAllProducts();
-            assertThat(products).hasSizeGreaterThan(1); // 기존 + 새로 생성한 상품
+            // Then: 생성한 상품을 다시 조회할 수 있는지 검증
+            assertThat(productService.getProductById(createdProduct.getId())).isEqualTo(newProduct);
         }
 
         @Test

@@ -8,11 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,8 +19,8 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@Import(MyBatisUserServiceImpl.class)
 @ActiveProfiles("mybatis")
+@Transactional
 @DisplayName("MyBatisUserServiceImpl Test")
 class MyBatisUserServiceImplTest {
 
@@ -54,14 +53,11 @@ class MyBatisUserServiceImplTest {
         @Test
         @DisplayName("모든 사용자 조회 테스트")
         void testGetAllUsers() {
-            // Given: data.sql에서 미리 생성된 사용자들
-
             // When: 모든 사용자를 조회
             List<User> users = userService.getAllUsers();
 
             // Then: 데이터베이스에 저장된 총 사용자 수가 예상과 일치하는지 검증
-            assertThat(users).isNotEmpty();
-            assertThat(users).anyMatch(user -> "test_user".equals(user.getUsername()));
+            assertThat(users).extracting(User::getId).contains(testUser.getId());
         }
 
         @Test

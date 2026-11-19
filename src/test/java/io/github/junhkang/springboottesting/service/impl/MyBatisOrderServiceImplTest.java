@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,12 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * - 성능 검토: 복잡한 SQL 쿼리가 올바르게 동작하는지 및 성능 상의 문제가 없는지를 추가적으로 검토할 수 있습니다.
  *
  * @SpringBootTest 어노테이션을 사용하여 MyBatis와 관련된 모든 컴포넌트를 로드하며,
- * @Import를 통해 MyBatisOrderServiceImpl 클래스를 로드하여 이 구현체를 테스트합니다.
  * @ActiveProfiles("mybatis") 어노테이션을 통해 'mybatis' 프로파일을 활성화하여
  * MyBatis 관련 설정과 빈이 올바르게 로드되는지 검증합니다.
  */
 @SpringBootTest
-@Import(MyBatisOrderServiceImpl.class)
 @ActiveProfiles("mybatis")
 @Transactional
 @DisplayName("MyBatisOrderServiceImplTest")
