@@ -1,0 +1,23 @@
+# Security Shield: security updates only. Version-update PRs are disabled (limit 0); security
+# updates still open. Same-major fixes are grouped into one PR per ecosystem, which Devin merges
+# after CI + security-patch-gate pass. Major bumps arrive separately and wait for owner review.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      security-same-major:
+        applies-to: security-updates
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      security-same-major:
+        applies-to: security-updates
+        update-types: [minor, patch]
