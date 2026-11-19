@@ -1,74 +1,37 @@
 # Spring Boot Testing From Zero To Hero
 
-스프링 부트에서 테스트 코드를 처음부터 고급까지 다루는 종합 가이드입니다.
+작은 전자상거래 앱으로 Spring Boot 테스트를 익히는 한국어 가이드입니다. JPA와 MyBatis로 구현한 주문 예제를 바탕으로 어떤 동작을 검증할지, 어느 범위에서 테스트할지 살펴봅니다.
 
-## 소개
+[산업의 역군](https://www.sankun.com/) 개발팀이 테스트 작성 기준을 공유하고 신규 백엔드 개발자의 온보딩을 돕기 위해 시작한 프로젝트입니다.
 
-많은 좋은 개발자분들께서 이미 테스트의 중요성과 작성 방법에 대해 잘 정리하고 공유하고 있습니다. **[산업의 역군](https://www.sankun.com/) 개발팀**에서는 이러한 자료들을 참고하여 TDD(Test-Driven Development), BDD(Behavior-Driven Development) 방식으로 개발을 진행하기도 하지만, **기존 코드베이스에 테스트 코드를 작성할 때**는 여전히 많은 고민과 노력이 따릅니다. 
+## 빠른 시작
 
-테스트 코드를 작성할 시 개발팀원이 동일한 수준의 이해도를 가지고 있음에도 불구하고, **테스트의 깊이**나 **테스트의 방향**이 서로 다른 경우가 종종 발생합니다. 이러한 상황을 개선하고, 더 안정적인 개발 프로세스를 구축하고자 **어느 정도의 규칙을 정하고**, 개발팀이 **같은 생각을 하며 같은 방향을 보며 개발**할 수 있도록 이 레포지토리를 만들게 되었습니다. 또한 **신규 백엔드 개발자의 온보딩**을 지원하기 위한 자료로도 활용하고자 합니다.
+JDK 21이 필요합니다. Maven Wrapper가 프로젝트에 지정된 Maven 버전을 내려받습니다. 예제는 Spring Boot 4.1, MyBatis Spring Boot Starter 4.1, JUnit 6의 Jupiter API를 사용합니다.
 
-특히, **테스트 전략을 최적화하고, 코드 품질을 높이며, 팀 내에서 일관된 테스트 기준**을 세우기 위해 레포지토리는 다음의 네 가지 핵심 질문에 대한 고민을 하고자 합니다.
+| 실행할 테스트 | macOS·Linux | Windows PowerShell |
+| --- | --- | --- |
+| 전체 테스트와 빌드 | `./mvnw clean verify` | `.\mvnw.cmd clean verify` |
+| 주문 수량 인수 테스트 (JPA·MyBatis) | `./mvnw "-Dtest=*OrderQuantitySpecificationTest" test` | `.\mvnw.cmd "-Dtest=*OrderQuantitySpecificationTest" test` |
 
-1. **WHY** - 왜 테스트를 작성해야 하는가?
-2. **HOW** - 테스트 코드를 어떻게 작성해야 하는가?
-3. **WHEN** - 언제 테스트 코드를 적용해야 하는가?
-4. **HOW MUCH** - 얼마나 깊게 테스트 코드를 작성해야 하는가?
+[GitHub Actions](https://github.com/junhkang/springboot-testing-from-zero-to-hero/actions/workflows/maven.yml)에서도 Ubuntu와 Windows에서 `clean verify`를 실행합니다.
 
-이 가이드는 간단한 전자상거래 시스템을 예제로 활용해 다양한 테스트 케이스와 실제 코드를 통해, 이 질문들에 대한 실용적인 답변을 제시합니다.
+### 예제 앱 실행
 
-## 실행 및 테스트
-
-JDK 21이 필요합니다. Maven Wrapper가 Maven 3.9.16을 내려받습니다. Spring Boot 4.1.2, MyBatis Spring Boot Starter 4.1.0, JUnit Jupiter 6.0.3을 사용합니다.
+아래 명령 중 하나를 실행합니다. 첫 번째 명령은 기본 `jpa` 프로필을 사용합니다. Windows에서는 `./mvnw`를 `.\mvnw.cmd`로 바꿉니다.
 
 ```bash
-./mvnw clean verify
 ./mvnw spring-boot:run
+./mvnw spring-boot:run "-Dspring-boot.run.profiles=mybatis"
 ```
 
-기본 프로필은 `jpa`입니다. MyBatis 예제는 `./mvnw spring-boot:run -Dspring-boot.run.profiles=mybatis`로 실행합니다. 두 프로필 모두 인메모리 H2를 사용합니다. 기본 주소에서 `GET /orders`로 샘플 주문을 조회할 수 있습니다.
+서버가 시작되면 [http://localhost:8080/orders](http://localhost:8080/orders)에서 샘플 주문을 조회할 수 있습니다. 두 프로필 모두 인메모리 H2를 사용하므로 앱을 재시작하면 데이터가 초기화됩니다. H2 콘솔이 필요하면 실행 명령에 `"-Dspring-boot.run.arguments=--spring.h2.console.enabled=true"`를 추가하고, 시작 로그에 표시된 JDBC URL로 [H2 콘솔](http://localhost:8080/h2-console)에 접속합니다.
 
-Windows에서는 `./mvnw` 대신 `.\mvnw.cmd`를 실행합니다. 로컬 H2 콘솔이 필요하면 실행 시 `-Dspring-boot.run.arguments=--spring.h2.console.enabled=true`를 전달하고, 시작 로그의 JDBC URL로 `/h2-console`에 접속합니다.
+## 학습 순서
 
-# 목차
+1. [왜 테스트를 작성하는가?](docs/1.why.md) — 회귀 테스트와 FIRST 원칙을 이해합니다.
+2. [어떻게 테스트를 작성하는가?](docs/2.how.md) — 검증하려는 동작에 맞춰 단위·슬라이스·통합 테스트를 선택합니다.
+3. [언제 테스트를 작성하는가?](docs/3.when.md) — 신규 기능, 버그 수정, 리팩터링에서 테스트를 추가할 시점을 판단합니다.
+4. [어디까지 테스트하는가?](docs/4.how-deep.md) — 경계값, 실패 후 상태, 테스트 계층과 커버리지를 기준으로 범위를 정합니다.
+5. [스펙을 실행 가능한 테스트로](docs/5.spec-driven-development.md) — 주문 수량의 인수 조건을 정의하고 같은 시나리오를 JPA와 MyBatis에 적용합니다.
 
-1. [WHY - 왜 테스트를 작성해야 하는가?](docs/1.why.md)
-    - 1.1 테스트 코드의 중요성
-    - 1.2 테스트 코드 작성의 장점
-        - 1.2.1 안정적인 개발 환경 구축
-        - 1.2.2 버그 감소 및 코드 품질 향상
-        - 1.2.3 리팩토링의 용이성
-        - 1.2.4 단일 책임 원칙(SOLID) 준수
-    - 1.3 테스트를 작성하지 않았을 때의 문제점
-    - 1.4 좋은 테스트 코드 - FIRST 원칙
-
-
-2. [HOW - 테스트 코드를 어떻게 작성해야 하는가?](docs/2.how.md)
-    - 2.1 테스트 케이스 선택 방법
-    - 2.2 TDD (Test-Driven Development) 방법론
-    - 2.3 다양한 테스트 종류와 계층 구조 이해
-    - 2.4 JUnit Jupiter 활용
-    - 2.5 Mockito와 같은 Mocking 프레임워크 사용
-    - 2.6 다양한 테스트 어노테이션 및 도구 활용
-    - 2.7 MockMvc와 WebTestClient를 사용한 웹 레이어 테스트
-
-
-3. [WHEN - 언제 테스트 코드를 적용해야 하는가?](docs/3.when.md)
-    - 3.1 TDD와 BDD의 개념 및 적용 시점
-    - 3.2 기존 코드베이스에 테스트 추가하기
-    - 3.3 새로운 기능 개발 시 테스트 작성 시점
-    - 3.4 리팩토링 시 테스트의 역할
-    - 3.5 테스트 작성의 우선순위와 체크리스트
-
-
-4. [HOW DEEP - 얼마나 깊게 테스트 코드를 작성해야 하는가?](docs/4.how-deep.md)
-    - 4.1 테스트 깊이를 결정하는 기준
-    - 4.2 테스트 커버리지 및 품질 지표 활용
-    - 4.3 오버테스팅의 문제점
-    - 4.4 효율적인 테스트 범위 설정을 위한 체크리스트
-    - 4.5 리팩토링과 테스트의 균형 잡기
-
-5. [SPEC-DRIVEN DEVELOPMENT - 스펙에서 테스트로](docs/5.spec-driven-development.md)
-    - 5.1 주문 수량 스펙
-    - 5.2 인수 조건을 테스트에 옮기기
-    - 5.3 실패를 확인하고 구현하기
+주문 예제부터 실습하려면 [5장](docs/5.spec-driven-development.md)에서 시작하세요. 도구별 공식 문서와 추가 읽을거리는 [참고 자료](REFERENCES.md)에 있습니다.
