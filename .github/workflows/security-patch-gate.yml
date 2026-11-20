@@ -1,0 +1,39 @@
+name: security-patch-gate
+
+# Security Shield: decides whether a dependency PR (from Dependabot, or a Devin branch named
+# devin/security-shield-*) is a same-major bump that Devin may merge once CI is green.
+# A red result is not an error — it means the PR needs owner review.
+# pull_request_target runs this workflow and the gate script as they are on the base branch,
+# so a PR cannot edit its own gate. The PR is only fetched and read through git, never checked
+# out or executed — keep it that way.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-patch-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  security-patch-gate:
+    if: github.event.pull_request.user.login == 'dependabot[bot]' || startsWith(github.head_ref, 'devin/security-shield-')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run gate (base branch copy) against the PR head
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --no-tags origin "+refs/pull/$PR/head:refs/remotes/pr/head"
+          test "$(git rev-parse refs/remotes/pr/head)" = "$HEAD_SHA"
+          node .github/scripts/security-patch-gate.mjs HEAD "$HEAD_SHA"
